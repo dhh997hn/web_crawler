@@ -1,0 +1,5 @@
+credentials.yaml
+output/
+__pycache__/
+*.pyc
+.venv/

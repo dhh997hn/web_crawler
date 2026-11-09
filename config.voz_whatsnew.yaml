@@ -1,0 +1,59 @@
+# voz.vn latest posts crawl (/whats-new/posts/)
+site:
+  name: voz-whatsnew
+  base_url: https://voz.vn
+  engine: curl_cffi
+  impersonate: chrome
+
+login:
+  enabled: false
+
+crawl:
+  endpoint: /whats-new/posts/
+  method: GET
+  response_type: html
+  page_url_template: "page-{page}"
+  start_page: 1
+  max_pages: 0
+  items_selector: 'div.structItem--thread[class*="js-threadListItem"]'
+  pagination: next_link
+  next_page_selector: "a.pageNav-jump--next"
+  served_page_selector: ".pageNav-page--current"
+  total_pages_selector: "input.js-pageJumpPage"
+  total_pages_attr: "max"
+  stop_when_empty: true
+  stop_status_codes: [404]
+  fields:
+    title:
+      selector: ".structItem-title a:not(.labelLink)"
+      attr: text
+    url:
+      selector: ".structItem-title a:not(.labelLink)"
+      attr: href
+      base_url: "https://voz.vn"
+    author:
+      selector: ""
+      attr: data-author
+    replies:
+      selector: ".structItem-cell--meta .pairs:not(.structItem-minor) dd"
+      attr: text
+    views:
+      selector: ".structItem-cell--meta .pairs.structItem-minor dd"
+      attr: text
+    last_post_time:
+      selector: ".structItem-cell--latest time"
+      attr: "data-time"
+    last_post_user:
+      selector: ".structItem-cell--latest a.username"
+      attr: text
+  request_delay: 2.0
+  timeout: 30
+  verify_ssl: true
+
+output:
+  format: jsonl
+  file: output/voz_whatsnew.jsonl
+  csv_columns: []
+  checkpoint_file: output/voz_whatsnew_checkpoint.json
+  append_mode: true               # mỗi lần chạy = 1 lượt crawl mới, NỐI TIẾP vào file (dành cho chạy định kỳ)
+  daily_file: true                # them date vao ten file: voz_whatsnew.dd-mm-yyyy.jsonl (1 file/ngay)

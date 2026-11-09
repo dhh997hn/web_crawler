@@ -1,0 +1,40 @@
+# Main crawl configuration. Copy to config.yaml and adjust.
+site:
+  name: example-api
+  base_url: https://api.example.com
+
+login:
+  enabled: true                  # dat false neu khong can login
+  endpoint: /auth/login          # POST endpoint for authentication
+  payload_type: json             # json | form
+  username_field: username       # field name expected by the API
+  password_field: password
+  extra_payload: {}              # extra static fields, e.g. {grant_type: password}
+  token_path: data.token         # dot-path to token in login response; empty = use session cookies
+  auth_header: Authorization     # header used to send the token; empty = rely on cookies
+  token_prefix: "Bearer "
+  relogin_status_codes: [401, 403]
+  max_retries: 3                 # login attempts before giving up
+  retry_backoff: 2.0             # multiplier between login retries
+
+crawl:
+  endpoint: /api/v1/items
+  method: GET
+  page_param: page
+  size_param: size
+  page_size: 100
+  start_page: 1
+  max_pages: 0                   # 0 = unlimited, stop by empty page / total_pages
+  items_path: data.items         # dot-path to the list of records in each response
+  stop_when_empty: true
+  total_pages_path: data.totalPages  # optional: response field with total number of pages
+  params: {}                     # extra query params, e.g. {status: active}
+  request_delay: 1.0             # seconds between requests (rate limit)
+  timeout: 30
+  verify_ssl: true
+
+output:
+  format: jsonl                  # jsonl | csv
+  file: output/items.jsonl
+  csv_columns: []                # for csv: item keys (dot-paths), e.g. [id, name]
+  checkpoint_file: output/checkpoint.json
